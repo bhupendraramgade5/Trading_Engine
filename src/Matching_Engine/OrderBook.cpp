@@ -13,8 +13,8 @@ using SellBook = std::map<Price, std::deque<Order>>;
 void OrderBook::addOrder(Order order)
 {
     match(order);
-    if (order.st_ordquantity > 0){
-        if (order.st_ordside == Side::BUY)
+    if (order.quantity > 0){
+        if (order.side == Side::BUY)
             addBuyOrder(order);
         else
             addSellOrder(order);
@@ -24,13 +24,13 @@ void OrderBook::addOrder(Order order)
 void OrderBook::addBuyOrder(Order order)
 {
     auto& book = m_buySide;
-    auto& queue = book[order.st_ordprice];
+    auto& queue = book[order.price];
     queue.push_back(order);
     auto it = std::prev(queue.end());
 
-    m_orderLookup[order.st_ordorderId] = {
-        order.st_ordside,
-        order.st_ordprice,
+    m_orderLookup[order.orderId] = {
+        order.side,
+        order.price,
         it
     };
 }
@@ -38,13 +38,13 @@ void OrderBook::addBuyOrder(Order order)
 void OrderBook::addSellOrder(Order order)
 {
     auto& book = m_sellSide;
-    auto& queue = book[order.st_ordprice];
+    auto& queue = book[order.price];
     queue.push_back(order);
     auto it = std::prev(queue.end());
 
-    m_orderLookup[order.st_ordorderId] = {
-        order.st_ordside,
-        order.st_ordprice,
+    m_orderLookup[order.orderId] = {
+        order.side,
+        order.price,
         it
     };
 }
@@ -52,31 +52,31 @@ void OrderBook::addSellOrder(Order order)
 
 void OrderBook::match(Order& incoming)
 {
-    while (incoming.st_ordquantity > 0)
+    while (incoming.quantity > 0)
     {
-        if (incoming.st_ordside == Side::BUY)
+        if (incoming.side == Side::BUY)
         {
             if (m_sellSide.empty())
                 break;
 
             auto bestSell = m_sellSide.begin();
 
-            if (bestSell->first > incoming.st_ordprice)
+            if (bestSell->first > incoming.price)
                 break;
 
             auto& queue = bestSell->second;
             auto& topOrder = queue.front();
 
             Quantity traded =
-                std::min(incoming.st_ordquantity, topOrder.st_ordquantity);
+                std::min(incoming.quantity, topOrder.quantity);
 
-            incoming.st_ordquantity -= traded;
-            topOrder.st_ordquantity -= traded;
+            incoming.quantity -= traded;
+            topOrder.quantity -= traded;
 
             // generate trade
             Trade trade{
-                incoming.st_ordorderId,
-                topOrder.st_ordorderId,
+                incoming.orderId,
+                topOrder.orderId,
                 bestSell->first,
                 traded
             };
@@ -84,9 +84,9 @@ void OrderBook::match(Order& incoming)
             if (m_tradeCallback)
                 TradeCallback(trade);
 
-            if (topOrder.st_ordquantity == 0)
+            if (topOrder.quantity == 0)
             {
-                m_orderLookup.erase(topOrder.st_ordorderId);
+                m_orderLookup.erase(topOrder.orderId);
                 queue.pop_front();
 
                 if (queue.empty())
@@ -100,21 +100,21 @@ void OrderBook::match(Order& incoming)
 
             auto bestBuy = m_buySide.begin();
 
-            if (bestBuy->first < incoming.st_ordprice)
+            if (bestBuy->first < incoming.price)
                 break;
 
             auto& queue = bestBuy->second;
             auto& topOrder = queue.front();
 
             Quantity traded =
-                std::min(incoming.st_ordquantity, topOrder.st_ordquantity);
+                std::min(incoming.quantity, topOrder.quantity);
 
-            incoming.st_ordquantity -= traded;
-            topOrder.st_ordquantity -= traded;
+            incoming.quantity -= traded;
+            topOrder.quantity -= traded;
 
             Trade trade{
-                topOrder.st_ordorderId,
-                incoming.st_ordorderId,
+                topOrder.orderId,
+                incoming.orderId,
                 bestBuy->first,
                 traded
             };
@@ -122,9 +122,9 @@ void OrderBook::match(Order& incoming)
             if (m_tradeCallback)
                 TradeCallback(trade);
 
-            if (topOrder.st_ordquantity == 0)
+            if (topOrder.quantity == 0)
             {
-                m_orderLookup.erase(topOrder.st_ordorderId);
+                m_orderLookup.erase(topOrder.orderId);
                 queue.pop_front();
 
                 if (queue.empty())
@@ -134,23 +134,22 @@ void OrderBook::match(Order& incoming)
     }
 }
 
-
 void OrderBook::cancelOrder(OrderId orderId)
 {
     auto it = m_orderLookup.find(orderId);
     if (it == m_orderLookup.end())
-        return; // or throw
+        return;
 
-    auto& location = it->second;
+    auto location = it->second;
 
-    if (location.st_OrdLocside == Side::BUY)
+    if (location.side == Side::BUY)
     {
-        auto bookIt = m_buySide.find(location.st_OrdLocprice);
+        auto bookIt = m_buySide.find(location.price);
 
         if (bookIt != m_buySide.end())
         {
             auto& queue = bookIt->second;
-            queue.erase(location.st_ordIterator);
+            queue.erase(location.Iterator);
 
             if (queue.empty())
                 m_buySide.erase(bookIt);
@@ -158,12 +157,12 @@ void OrderBook::cancelOrder(OrderId orderId)
     }
     else
     {
-        auto bookIt = m_sellSide.find(location.st_OrdLocprice);
+        auto bookIt = m_sellSide.find(location.price);
 
         if (bookIt != m_sellSide.end())
         {
             auto& queue = bookIt->second;
-            queue.erase(location.st_ordIterator);
+            queue.erase(location.Iterator);
 
             if (queue.empty())
                 m_sellSide.erase(bookIt);
@@ -180,13 +179,16 @@ void OrderBook::modifyOrder(OrderId orderId, Price newPrice, Quantity newQty)
         return; // or throw
 
     auto location = it->second;
-    auto& order = *(location.st_ordIterator);
+    auto& order = *(location.Iterator);
 
     Order newOrder = order;
 
-    newOrder.st_ordprice = newPrice;
-    newOrder.st_ordquantity = newQty;
-    newOrder.st_ordtimestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    newOrder.price = newPrice;
+    newOrder.quantity = newQty;
+    // newOrder.timestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    auto now = std::chrono::steady_clock::now();
+    newOrder.timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
+    now.time_since_epoch()).count();
 
     cancelOrder(orderId);
 

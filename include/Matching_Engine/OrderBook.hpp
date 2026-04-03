@@ -23,29 +23,29 @@ enum class Side
 
 struct Order
 {
-    Symbol st_ordsymbol;
-    OrderId st_ordorderId;
-    UserId st_orduserId;
+    Symbol symbol;
+    OrderId orderId;
+    UserId userId;
 
-    Side st_ordside;
+    Side side;
 
-    Price st_ordprice;
-    Quantity st_ordquantity;
+    Price price;
+    Quantity quantity;
 
-    uint64_t st_ordtimestamp;
+    uint64_t timestamp;
 };
 
 struct OrderLocation
 {
-    Side st_OrdLocside;
-    Price st_OrdLocprice;
-    std::deque<Order>::iterator st_ordIterator;
+    Side side;
+    Price price;
+    std::deque<Order>::iterator Iterator;
 };
 
 struct Trade
 {
-    OrderId st_TrdbuyOrderId;
-    OrderId st_TrdsellOrderId;
+    OrderId buyOrderId;
+    OrderId sellOrderId;
 
     Price price;
     Quantity quantity;

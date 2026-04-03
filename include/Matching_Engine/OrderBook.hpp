@@ -97,6 +97,8 @@ private:
     std::unordered_map<OrderId, OrderLocation> m_orderLookup;
 
     std::function<void(const Trade&)> m_tradeCallback;
+
+    Symbol m_symbol;
 };
 
 #endif // ORDERBOOK_HPP

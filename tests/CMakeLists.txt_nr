@@ -1,0 +1,24 @@
+include(FetchContent)
+
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/heads/main.zip
+)
+
+FetchContent_MakeAvailable(googletest)
+
+add_executable(orderbook_tests
+    orderbook_tests.cpp
+)
+
+target_link_libraries(orderbook_tests
+    matching_engine
+    gtest_main
+)
+
+target_include_directories(orderbook_tests
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+add_test(NAME OrderBookTest COMMAND orderbook_tests)

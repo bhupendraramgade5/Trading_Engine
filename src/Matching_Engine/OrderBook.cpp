@@ -1,4 +1,4 @@
-#include "OrderBook.hpp"
+#include "Matching_Engine/OrderBook.hpp"
 
 #include <algorithm>
 #include <stdexcept>
@@ -233,3 +233,14 @@ void OrderBook::printBook() const
 
     std::cout << "\n===============================\n";
 }
+
+void OrderBook::setTradeCallback(TradeCallback cb)
+{
+    m_tradeCallback = std::move(cb);
+}
+
+OrderBook::OrderBook(Symbol symbol)
+    : m_symbol(symbol)
+{
+}
+

@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/trading_engine.dir/main.cpp.o -o trading_engine  libmatching_engine.a 

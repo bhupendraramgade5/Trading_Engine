@@ -1,10 +1,18 @@
 add_library(matching_engine
-    MatchingEngine/OrderBook.cpp
-    MatchingEngine/MatchingEngine.cpp
+    Matching_Engine/MatchingEngine.cpp
+    Matching_Engine/OrderBook.cpp
+    Matching_Engine/Command_Parser.cpp
 )
 
-target_include_directories(matching_engine PUBLIC ../include)
+target_include_directories(matching_engine
+    PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+)
 
-add_executable(TradingEngine main.cpp)
+add_executable(trading_engine
+    main.cpp
+)
 
-target_link_libraries(TradingEngine matching_engine)
+target_link_libraries(trading_engine
+    matching_engine
+)

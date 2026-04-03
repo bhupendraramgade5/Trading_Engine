@@ -11,6 +11,37 @@ void MatchingEngine::handleCommand(const Command& command)
     );
 }
 
+
+void MatchingEngine::handle(const NewOrderCommand& cmd)
+{
+    addOrder(cmd.order);
+}
+
+void MatchingEngine::handle(const CancelOrderCommand& cmd)
+{
+    cancelOrder(cmd.symbol, cmd.orderId);
+}
+
+void MatchingEngine::handle(const ModifyOrderCommand& cmd)
+{
+    modifyOrder(
+        cmd.symbol,
+        cmd.orderId,
+        cmd.price,
+        cmd.quantity
+    );
+}
+
+void MatchingEngine::handle(const PrintCommand& cmd)
+{
+    printBook(cmd.symbol);
+}
+
+void MatchingEngine::handle(const PrintAllCommand&)
+{
+    printAllBooks();
+}
+
 OrderBook& MatchingEngine::getOrderBook(Symbol symbol)
 {
     auto it = m_books.find(symbol);

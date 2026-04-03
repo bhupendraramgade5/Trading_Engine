@@ -5,32 +5,8 @@
 #include <memory>
 #include <variant>
 #include <unordered_map>
+#include "Command.hpp"
 
-struct NewOrderCommand
-{
-    Order order;
-};
-
-struct CancelOrderCommand
-{
-    Symbol symbol;
-    OrderId orderId;
-};
-
-struct ModifyOrderCommand
-{
-    Symbol symbol;
-    OrderId orderId;
-    Price price;
-    Quantity quantity;
-};
-
-struct PrintCommand
-{
-    Symbol symbol;
-};
-
-using Command = std::variant< NewOrderCommand, CancelOrderCommand, ModifyOrderCommand, PrintCommand >;
 class MatchingEngine
 {
 public:
@@ -61,6 +37,7 @@ private:
     void handle(const CancelOrderCommand&);
     void handle(const ModifyOrderCommand&);
     void handle(const PrintCommand&);
+    void handle(const PrintAllCommand&);
 
 private:
 

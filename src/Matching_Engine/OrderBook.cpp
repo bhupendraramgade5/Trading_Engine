@@ -4,28 +4,50 @@
 #include <stdexcept>
 #include <iostream>
 #include <limits>
+#include <variant>
+
+using BuyBook  = std::map<Price, std::deque<Order>, std::greater<>>;
+using SellBook = std::map<Price, std::deque<Order>>;
 
 void OrderBook::addOrder(Order order)
 {
     match(order);
-
-    // If order still has quantity left
-    if (order.quantity > 0)
-    {
-        auto& book = (order.side == Side::BUY)? m_buySide : m_sellSide;
-
-        auto& queue = book[order.price];
-        queue.push_back(order);
-
-        auto it = std::prev(queue.end());
-
-        m_orderLookup[order.orderId] = {
-            order.side,
-            order.price,
-            it
-        };
+    if (order.quantity > 0){
+        if (order.side == Side::BUY)
+            addBuyOrder(order);
+        else
+            addSellOrder(order);
     }
 }
+
+void OrderBook::addBuyOrder(Order order)
+{
+    auto& book = m_buySide;
+    auto& queue = book[order.price];
+    queue.push_back(order);
+    auto it = std::prev(queue.end());
+
+    m_orderLookup[order.orderId] = {
+        order.side,
+        order.price,
+        it
+    };
+}
+
+void OrderBook::addSellOrder(Order order)
+{
+    auto& book = m_sellSide;
+    auto& queue = book[order.price];
+    queue.push_back(order);
+    auto it = std::prev(queue.end());
+
+    m_orderLookup[order.orderId] = {
+        order.side,
+        order.price,
+        it
+    };
+}
+
 
 void OrderBook::match(Order& incoming)
 {

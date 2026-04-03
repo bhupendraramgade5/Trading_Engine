@@ -80,12 +80,14 @@ private:
 
     // Matching Logic
     void  match(Order& incoming);
+    void addBuyOrder(Order order);
+    void addSellOrder(Order order);
 
 
 private:
 
     // BUY SIDE
-    std::map<Price, std::deque<Order>, std::greater<>> m_buySide;
+    std::map<Price, std::deque<Order>,std::greater<Price>> m_buySide;
 
     // SELL SIDE
     std::map<Price, std::deque<Order>> m_sellSide;

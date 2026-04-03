@@ -5,6 +5,7 @@
 #include <iostream>
 #include <limits>
 #include <variant>
+#include <chrono>
 
 using BuyBook  = std::map<Price, std::deque<Order>, std::greater<>>;
 using SellBook = std::map<Price, std::deque<Order>>;
@@ -131,4 +132,63 @@ void OrderBook::match(Order& incoming)
             }
         }
     }
+}
+
+
+void OrderBook::cancelOrder(OrderId orderId)
+{
+    auto it = m_orderLookup.find(orderId);
+    if (it == m_orderLookup.end())
+        return; // or throw
+
+    auto& location = it->second;
+
+    if (location.st_OrdLocside == Side::BUY)
+    {
+        auto bookIt = m_buySide.find(location.st_OrdLocprice);
+
+        if (bookIt != m_buySide.end())
+        {
+            auto& queue = bookIt->second;
+            queue.erase(location.st_ordIterator);
+
+            if (queue.empty())
+                m_buySide.erase(bookIt);
+        }
+    }
+    else
+    {
+        auto bookIt = m_sellSide.find(location.st_OrdLocprice);
+
+        if (bookIt != m_sellSide.end())
+        {
+            auto& queue = bookIt->second;
+            queue.erase(location.st_ordIterator);
+
+            if (queue.empty())
+                m_sellSide.erase(bookIt);
+        }
+    }
+
+    m_orderLookup.erase(it);
+}
+
+void OrderBook::modifyOrder(OrderId orderId, Price newPrice, Quantity newQty)
+{
+    auto it = m_orderLookup.find(orderId);
+    if (it == m_orderLookup.end())
+        return; // or throw
+
+    auto location = it->second;
+    auto& order = *(location.st_ordIterator);
+
+    Order newOrder = order;
+
+    newOrder.st_ordprice = newPrice;
+    newOrder.st_ordquantity = newQty;
+    newOrder.st_ordtimestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
+    cancelOrder(orderId);
+
+    addOrder(newOrder);
 }

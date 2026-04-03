@@ -83,7 +83,7 @@ void OrderBook::match(Order& incoming)
             };
 
             if (m_tradeCallback)
-                TradeCallback(trade);
+                m_tradeCallback(trade);
 
             if (topOrder.quantity == 0)
             {
@@ -121,7 +121,7 @@ void OrderBook::match(Order& incoming)
             };
 
             if (m_tradeCallback)
-                TradeCallback(trade);
+                m_tradeCallback(trade);
 
             if (topOrder.quantity == 0)
             {

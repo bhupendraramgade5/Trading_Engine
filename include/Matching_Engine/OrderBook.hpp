@@ -96,7 +96,7 @@ private:
     // ORDER LOOKUP
     std::unordered_map<OrderId, OrderLocation> m_orderLookup;
 
-    std::function<void(const Trade&)> m_tradeCallback;
+    TradeCallback m_tradeCallback;
 
     Symbol m_symbol;
 };

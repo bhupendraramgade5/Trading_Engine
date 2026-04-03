@@ -12,8 +12,8 @@ using SellBook = std::map<Price, std::deque<Order>>;
 void OrderBook::addOrder(Order order)
 {
     match(order);
-    if (order.quantity > 0){
-        if (order.side == Side::BUY)
+    if (order.st_ordquantity > 0){
+        if (order.st_ordside == Side::BUY)
             addBuyOrder(order);
         else
             addSellOrder(order);
@@ -23,13 +23,13 @@ void OrderBook::addOrder(Order order)
 void OrderBook::addBuyOrder(Order order)
 {
     auto& book = m_buySide;
-    auto& queue = book[order.price];
+    auto& queue = book[order.st_ordprice];
     queue.push_back(order);
     auto it = std::prev(queue.end());
 
-    m_orderLookup[order.orderId] = {
-        order.side,
-        order.price,
+    m_orderLookup[order.st_ordorderId] = {
+        order.st_ordside,
+        order.st_ordprice,
         it
     };
 }
@@ -37,13 +37,13 @@ void OrderBook::addBuyOrder(Order order)
 void OrderBook::addSellOrder(Order order)
 {
     auto& book = m_sellSide;
-    auto& queue = book[order.price];
+    auto& queue = book[order.st_ordprice];
     queue.push_back(order);
     auto it = std::prev(queue.end());
 
-    m_orderLookup[order.orderId] = {
-        order.side,
-        order.price,
+    m_orderLookup[order.st_ordorderId] = {
+        order.st_ordside,
+        order.st_ordprice,
         it
     };
 }
@@ -51,31 +51,31 @@ void OrderBook::addSellOrder(Order order)
 
 void OrderBook::match(Order& incoming)
 {
-    while (incoming.quantity > 0)
+    while (incoming.st_ordquantity > 0)
     {
-        if (incoming.side == Side::BUY)
+        if (incoming.st_ordside == Side::BUY)
         {
             if (m_sellSide.empty())
                 break;
 
             auto bestSell = m_sellSide.begin();
 
-            if (bestSell->first > incoming.price)
+            if (bestSell->first > incoming.st_ordprice)
                 break;
 
             auto& queue = bestSell->second;
             auto& topOrder = queue.front();
 
             Quantity traded =
-                std::min(incoming.quantity, topOrder.quantity);
+                std::min(incoming.st_ordquantity, topOrder.st_ordquantity);
 
-            incoming.quantity -= traded;
-            topOrder.quantity -= traded;
+            incoming.st_ordquantity -= traded;
+            topOrder.st_ordquantity -= traded;
 
             // generate trade
             Trade trade{
-                incoming.orderId,
-                topOrder.orderId,
+                incoming.st_ordorderId,
+                topOrder.st_ordorderId,
                 bestSell->first,
                 traded
             };
@@ -83,9 +83,9 @@ void OrderBook::match(Order& incoming)
             if (m_tradeCallback)
                 TradeCallback(trade);
 
-            if (topOrder.quantity == 0)
+            if (topOrder.st_ordquantity == 0)
             {
-                m_orderLookup.erase(topOrder.orderId);
+                m_orderLookup.erase(topOrder.st_ordorderId);
                 queue.pop_front();
 
                 if (queue.empty())
@@ -99,21 +99,21 @@ void OrderBook::match(Order& incoming)
 
             auto bestBuy = m_buySide.begin();
 
-            if (bestBuy->first < incoming.price)
+            if (bestBuy->first < incoming.st_ordprice)
                 break;
 
             auto& queue = bestBuy->second;
             auto& topOrder = queue.front();
 
             Quantity traded =
-                std::min(incoming.quantity, topOrder.quantity);
+                std::min(incoming.st_ordquantity, topOrder.st_ordquantity);
 
-            incoming.quantity -= traded;
-            topOrder.quantity -= traded;
+            incoming.st_ordquantity -= traded;
+            topOrder.st_ordquantity -= traded;
 
             Trade trade{
-                topOrder.orderId,
-                incoming.orderId,
+                topOrder.st_ordorderId,
+                incoming.st_ordorderId,
                 bestBuy->first,
                 traded
             };
@@ -121,9 +121,9 @@ void OrderBook::match(Order& incoming)
             if (m_tradeCallback)
                 TradeCallback(trade);
 
-            if (topOrder.quantity == 0)
+            if (topOrder.st_ordquantity == 0)
             {
-                m_orderLookup.erase(topOrder.orderId);
+                m_orderLookup.erase(topOrder.st_ordorderId);
                 queue.pop_front();
 
                 if (queue.empty())

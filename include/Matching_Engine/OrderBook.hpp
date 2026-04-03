@@ -1,3 +1,6 @@
+#ifndef ORDERBOOK_HPP
+#define ORDERBOOK_HPP
+
 #include <iostream>
 #include <map>
 #include <deque>
@@ -10,6 +13,7 @@ using OrderId = uint64_t;
 using Price = int;
 using Quantity = int;
 using UserId = uint64_t;
+using Symbol = uint32_t;
 
 enum class Side
 {
@@ -19,6 +23,7 @@ enum class Side
 
 struct Order
 {
+    Symbol symbol;
     OrderId orderId;
     UserId userId;
 
@@ -54,9 +59,11 @@ public:
     OrderBook() = default;
     ~OrderBook() = default;
 
+    explicit OrderBook(Symbol symbol);
+
     // Core API
 
-    void addOrder(const Order& order);
+    void addOrder(Order order);
 
     void cancelOrder(OrderId orderId);
 
@@ -72,17 +79,21 @@ public:
 private:
 
     // Matching Logic
-    void match();
+    void  match(Order& incoming);
 
 
 private:
 
     // BUY SIDE
-    std::map<Price, std::deque<Order>, std::greater<>> buySide;
+    std::map<Price, std::deque<Order>, std::greater<>> m_buySide;
 
     // SELL SIDE
-    std::map<Price, std::deque<Order>> sellSide;
+    std::map<Price, std::deque<Order>> m_sellSide;
 
     // ORDER LOOKUP
-    std::unordered_map<OrderId, OrderLocation> orderLookup;
+    std::unordered_map<OrderId, OrderLocation> m_orderLookup;
+
+    std::function<void(const Trade&)> m_tradeCallback;
 };
+
+#endif // ORDERBOOK_HPP

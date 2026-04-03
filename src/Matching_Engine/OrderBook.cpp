@@ -6,6 +6,7 @@
 #include <limits>
 #include <variant>
 #include <chrono>
+#include <iomanip>
 
 using BuyBook  = std::map<Price, std::deque<Order>, std::greater<>>;
 using SellBook = std::map<Price, std::deque<Order>>;
@@ -187,10 +188,48 @@ void OrderBook::modifyOrder(OrderId orderId, Price newPrice, Quantity newQty)
     newOrder.quantity = newQty;
     // newOrder.timestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     auto now = std::chrono::steady_clock::now();
-    newOrder.timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
-    now.time_since_epoch()).count();
+    newOrder.timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
 
     cancelOrder(orderId);
 
     addOrder(newOrder);
+}
+
+void OrderBook::printBook() const
+{
+    std::cout << "\n========== ORDER BOOK ==========\n";
+
+    std::cout << "\n------ SELL SIDE ------\n";
+    std::cout << std::setw(10) << "Price"
+              << std::setw(10) << "Qty" << "\n";
+
+    for (const auto& [price, orders] : m_sellSide)
+    {
+        Quantity total = 0;
+
+        for (const auto& order : orders)
+            total += order.quantity;
+
+        std::cout << std::setw(10) << price
+                  << std::setw(10) << total << "\n";
+    }
+
+    std::cout << "\n-------------------------------\n";
+
+    std::cout << "\n------ BUY SIDE ------\n";
+    std::cout << std::setw(10) << "Price"
+              << std::setw(10) << "Qty" << "\n";
+
+    for (const auto& [price, orders] : m_buySide)
+    {
+        Quantity total = 0;
+
+        for (const auto& order : orders)
+            total += order.quantity;
+
+        std::cout << std::setw(10) << price
+                  << std::setw(10) << total << "\n";
+    }
+
+    std::cout << "\n===============================\n";
 }

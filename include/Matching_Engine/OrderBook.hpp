@@ -48,8 +48,12 @@ struct Trade
     OrderId buyOrderId;
     OrderId sellOrderId;
 
+    UserId buyer;
+    UserId seller;
+
     Price price;
     Quantity quantity;
+    Symbol symbol;
 };
 
 

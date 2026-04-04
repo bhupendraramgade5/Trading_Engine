@@ -75,11 +75,14 @@ void OrderBook::match(Order& incoming)
             topOrder.quantity -= traded;
 
             // generate trade
-            Trade trade{
+           Trade trade{
                 incoming.orderId,
                 topOrder.orderId,
+                incoming.userId,
+                topOrder.userId,
                 bestSell->first,
-                traded
+                traded,
+                m_symbol
             };
 
             if (m_tradeCallback)
@@ -116,10 +119,12 @@ void OrderBook::match(Order& incoming)
             Trade trade{
                 topOrder.orderId,
                 incoming.orderId,
+                topOrder.userId,
+                incoming.userId,
                 bestBuy->first,
-                traded
+                traded,
+                m_symbol
             };
-
             if (m_tradeCallback)
                 m_tradeCallback(trade);
 

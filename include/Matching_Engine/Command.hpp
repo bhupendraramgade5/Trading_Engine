@@ -33,6 +33,19 @@ struct PrintAllCommand
 {
 };
 
-using Command = std::variant< NewOrderCommand, CancelOrderCommand, ModifyOrderCommand, PrintCommand , PrintAllCommand>;
+struct PriceCommand
+{
+    Symbol symbol;
+    Price price;
+};
+
+struct PositionCommand
+{
+    UserId user;
+    Symbol symbol;
+};
+
+using Command = std::variant< NewOrderCommand, CancelOrderCommand, ModifyOrderCommand, PrintCommand , PrintAllCommand, PriceCommand, PositionCommand>;
+
 
 #endif

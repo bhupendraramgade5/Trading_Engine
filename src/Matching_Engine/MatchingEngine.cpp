@@ -42,6 +42,16 @@ void MatchingEngine::handle(const PrintAllCommand&)
     printAllBooks();
 }
 
+void MatchingEngine::handle(const PriceCommand& cmd)
+{
+    m_positionEngine.onPrice(cmd.symbol, cmd.price);
+}
+
+void MatchingEngine::handle(const PositionCommand& cmd)
+{
+    m_positionEngine.print(cmd.user, cmd.symbol);
+}
+
 OrderBook& MatchingEngine::getOrderBook(Symbol symbol)
 {
     auto it = m_books.find(symbol);
@@ -122,6 +132,8 @@ void MatchingEngine::printAllBooks() const
 
 void MatchingEngine::onTrade(const Trade& trade)
 {
+    m_positionEngine.onFill(trade);
+
     std::cout << "TRADE: "
               << trade.buyOrderId
               << " "
@@ -130,5 +142,7 @@ void MatchingEngine::onTrade(const Trade& trade)
               << trade.price
               << " "
               << trade.quantity
+              <<" "
+              <<trade.symbol
               << "\n";
 }

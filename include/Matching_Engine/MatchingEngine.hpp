@@ -1,6 +1,7 @@
 #ifndef MATCHING_ENGINE_HPP
 #define MATCHING_ENGINE_HPP
 
+#include "Position_Engine/PositionEngine.hpp"
 #include "Matching_Engine/OrderBook.hpp"
 #include <memory>
 #include <variant>
@@ -38,12 +39,15 @@ private:
     void handle(const ModifyOrderCommand&);
     void handle(const PrintCommand&);
     void handle(const PrintAllCommand&);
+    void handle(const PriceCommand&);
+    void handle(const PositionCommand&);
 
 private:
 
     std::unordered_map<
         Symbol,
         std::unique_ptr<OrderBook>> m_books;
+        PositionEngine m_positionEngine;
 };
 
 #endif // MATCHING_ENGINE_HPP

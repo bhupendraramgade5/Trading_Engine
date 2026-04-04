@@ -21,6 +21,12 @@ private:
     Command parseModify(std::istringstream& iss);
 
     Command parsePrint(std::istringstream& iss);
+
+    Command parsePrice(std::istringstream& iss);
+
+    Command parsePosition(std::istringstream& iss);
+
+
 };
 
 #endif // COMMAND_PARSER_HPP

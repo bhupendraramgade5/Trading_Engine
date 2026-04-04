@@ -196,3 +196,24 @@ TEST_F(OrderBookTest, TimePriority)
 
     EXPECT_EQ(firstTrade, 101);
 }
+
+TEST(IntegrationTest, FullFlow)
+{
+    MatchingEngine engine;
+
+    engine.handleCommand(
+        NewOrderCommand{
+            {1,100,1,Side::BUY,100,10,0}
+        });
+
+    engine.handleCommand(
+        NewOrderCommand{
+            {1,101,2,Side::SELL,100,10,0}
+        });
+
+    engine.handleCommand(
+        PositionCommand{1,1}
+    );
+
+    EXPECT_TRUE(true);
+}

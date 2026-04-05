@@ -9,7 +9,19 @@ protected:
     OrderBook book{symbol};
 };
 
-TEST(OrderBookTest, MultiSymbolIsolation)
+class MatchingEngineTest : public ::testing::Test
+{
+};
+
+class PositionEngineTest : public ::testing::Test
+{
+};
+
+class IntegrationTest : public ::testing::Test
+{
+};
+// 1
+TEST_F(OrderBookTest, MultiSymbolIsolation)
 {
     OrderBook book1{1};
     OrderBook book2{2};
@@ -29,17 +41,9 @@ TEST(OrderBookTest, MultiSymbolIsolation)
     EXPECT_FALSE(trade1);
     EXPECT_FALSE(trade2);
 }
-
+//2
 TEST_F(OrderBookTest, ModifyOrder)
 {
-    Order buy{1,100,1,Side::BUY,100,10,0};
-    Order sell{1,101,1,Side::SELL,105,10,0};
-
-    book.addOrder(buy);
-    book.addOrder(sell);
-
-    book.modifyOrder(100,105,10);
-
     bool trade = false;
 
     book.setTradeCallback(
@@ -48,12 +52,17 @@ TEST_F(OrderBookTest, ModifyOrder)
             trade = true;
         });
 
-    Order newSell{1,102,1,Side::SELL,105,10,0};
-    book.addOrder(newSell);
+    Order buy{1,100,1,Side::BUY,100,10,0};
+    Order sell{1,101,1,Side::SELL,105,10,0};
+
+    book.addOrder(buy);
+    book.addOrder(sell);
+
+    book.modifyOrder(100,105,10);
 
     EXPECT_TRUE(trade);
 }
-
+//3
 TEST_F(OrderBookTest, CancelRemovesOrder)
 {
     bool trade = false;
@@ -65,35 +74,38 @@ TEST_F(OrderBookTest, CancelRemovesOrder)
         });
 
     Order buy{1,100,1,Side::BUY,100,10,0};
-    Order sell{1,101,1,Side::SELL,100,10,0};
 
     book.addOrder(buy);
 
     book.cancelOrder(100);
 
+    Order sell{1,101,1,Side::SELL,100,10,0};
+
     book.addOrder(sell);
 
     EXPECT_FALSE(trade);
 }
-
+//4
 TEST_F(OrderBookTest, AddBuyOrder)
 {
     Order order{
-        1,      // symbol
-        100,    // orderId
-        1,      // userId
+        1,
+        100,
+        1,
         Side::BUY,
-        100,    // price
-        10,     // quantity
+        100,
+        10,
         0
     };
 
     book.addOrder(order);
 
-    EXPECT_TRUE(true); // placeholder
-}
+    book.cancelOrder(100);
 
-TEST(MatchingEngineTest, BasicTrade)
+    SUCCEED();
+}
+//5
+TEST_F(MatchingEngineTest, BasicTrade)
 {
     MatchingEngine engine;
 
@@ -109,8 +121,8 @@ TEST(MatchingEngineTest, BasicTrade)
 
     EXPECT_TRUE(true);
 }
-
-TEST(PositionEngineTest, BasicLongPosition)
+//6
+TEST_F(PositionEngineTest, BasicLongPosition)
 {
     PositionEngine engine;
 
@@ -126,7 +138,7 @@ TEST(PositionEngineTest, BasicLongPosition)
 
     EXPECT_TRUE(true);
 }
-
+//7
 TEST_F(OrderBookTest, PartialFill)
 {
     int tradedQty = 0;
@@ -151,7 +163,7 @@ TEST_F(OrderBookTest, PartialFill)
     EXPECT_EQ(tradedQty, 10);
 }
 
-
+//8
 TEST_F(OrderBookTest, PricePriority)
 {
     int tradedPrice = 0;
@@ -174,6 +186,7 @@ TEST_F(OrderBookTest, PricePriority)
 
     EXPECT_EQ(tradedPrice, 99);
 }
+//9
 TEST_F(OrderBookTest, TimePriority)
 {
     int firstTrade = 0;
@@ -197,7 +210,8 @@ TEST_F(OrderBookTest, TimePriority)
     EXPECT_EQ(firstTrade, 101);
 }
 
-TEST(IntegrationTest, FullFlow)
+//10
+TEST_F(IntegrationTest, FullFlow)
 {
     MatchingEngine engine;
 

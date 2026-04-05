@@ -3,6 +3,7 @@ add_library(
     Matching_Engine/MatchingEngine.cpp
     Matching_Engine/OrderBook.cpp
     Matching_Engine/Command_Parser.cpp
+    Position_Engine/PostionEngine.cpp
 )
 
 target_include_directories(

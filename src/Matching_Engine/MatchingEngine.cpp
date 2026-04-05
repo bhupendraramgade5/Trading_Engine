@@ -90,8 +90,14 @@ void MatchingEngine::cancelOrder(Symbol symbol, OrderId orderId)
 
 void MatchingEngine::addOrder(Order order)
 {
+    order.orderId = nextOrderId();
+
     auto& book = getOrderBook(order.symbol);
     book.addOrder(std::move(order));
+
+    std::cout << "ORDER ACCEPTED "
+              << order.orderId
+              << "\n";
 }
 
 void MatchingEngine::modifyOrder(Symbol symbol,
@@ -146,3 +152,9 @@ void MatchingEngine::onTrade(const Trade& trade)
               <<trade.symbol
               << "\n";
 }
+
+OrderId MatchingEngine::nextOrderId()
+{
+    return ++m_nextOrderId;
+}
+

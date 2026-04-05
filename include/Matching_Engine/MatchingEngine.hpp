@@ -25,13 +25,13 @@ public:
 
     void printBook(Symbol symbol) const;
     void printAllBooks() const;
-
+    
     void handleCommand(const Command& command);
 
 private:
     void onTrade(const Trade& trade);
     OrderBook& getOrderBook(Symbol symbol);
-
+    OrderId MatchingEngine::nextOrderId();
   
 
     void handle(const NewOrderCommand&);
@@ -48,6 +48,9 @@ private:
         Symbol,
         std::unique_ptr<OrderBook>> m_books;
         PositionEngine m_positionEngine;
+
+        
+    OrderId m_nextOrderId{0};
 };
 
 #endif // MATCHING_ENGINE_HPP

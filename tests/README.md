@@ -105,10 +105,10 @@ cd matching-engine
 ## [Commands](#content)
 ### **New Order**
 ```
-NEW <symbol> <orderId> <userId> <BUY/SELL> <price> <qty>
+NEW <symbol> <userId> <BUY/SELL> <price> <qty>
 
 Example:
-    NEW 1 100 1 BUY 100 10
+    NEW 1 1 BUY 100 10
 ```
 ### **Cancel Order**
 ```

@@ -49,8 +49,8 @@ private:
         std::unique_ptr<OrderBook>> m_books;
         PositionEngine m_positionEngine;
 
-        
-    OrderId m_nextOrderId{0};
+
+     OrderId m_nextOrderId{0};
 };
 
 #endif // MATCHING_ENGINE_HPP

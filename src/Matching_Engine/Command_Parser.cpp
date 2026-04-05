@@ -80,7 +80,7 @@ Command CommandParser::parseNew(std::istringstream& iss)
     Price price;
     Quantity qty;
 
-    iss >> symbol >> orderId >> userId >> sideStr >> price >> qty;
+    iss >> symbol >> userId >> sideStr >> price >> qty;
 
     Side side = (sideStr == "BUY") ? Side::BUY : Side::SELL;
 

@@ -44,12 +44,17 @@ build)
     cmake ..
     make -j
     ;;
-
+clean)
+    echo "Cleaning build..."
+    rm -rf build
+    ;;
 *)
+
     echo "Usage:"
     echo "  ./run.sh run     -> run engine"
     echo "  ./run.sh test    -> run all tests"
     echo "  ./run.sh match   -> run matching test"
     echo "  ./run.sh build   -> build project"
+    echo "  ./run.sh clean   -> clean build"
     ;;
 esac

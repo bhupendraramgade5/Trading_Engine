@@ -32,8 +32,8 @@ TEST_F(OrderBookTest, MultiSymbolIsolation)
     book1.setTradeCallback([&](const Trade&){ trade1 = true; });
     book2.setTradeCallback([&](const Trade&){ trade2 = true; });
 
-    Order buy{1,100,1,Side::BUY,100,10,0};
-    Order sell{2,101,1,Side::SELL,100,10,0};
+    Order buy{1,0,1,Side::BUY,100,10,0};
+    Order sell{2,0,1,Side::SELL,100,10,0};
 
     book1.addOrder(buy);
     book2.addOrder(sell);
@@ -52,13 +52,13 @@ TEST_F(OrderBookTest, ModifyOrder)
             trade = true;
         });
 
-    Order buy{1,100,1,Side::BUY,100,10,0};
-    Order sell{1,101,1,Side::SELL,105,10,0};
+    Order buy{1,1,1,Side::BUY,100,10,0};
+    Order sell{1,2,1,Side::SELL,105,10,0};
 
     book.addOrder(buy);
     book.addOrder(sell);
 
-    book.modifyOrder(100,105,10);
+    book.modifyOrder(1,105,10);
 
     EXPECT_TRUE(trade);
 }

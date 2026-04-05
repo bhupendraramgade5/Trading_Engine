@@ -31,7 +31,7 @@ public:
 private:
     void onTrade(const Trade& trade);
     OrderBook& getOrderBook(Symbol symbol);
-    OrderId MatchingEngine::nextOrderId();
+    OrderId nextOrderId();
   
 
     void handle(const NewOrderCommand&);

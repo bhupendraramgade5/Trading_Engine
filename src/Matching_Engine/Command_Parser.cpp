@@ -86,7 +86,7 @@ Command CommandParser::parseNew(std::istringstream& iss)
 
     Order order{
         symbol,
-        orderId,
+        0,
         userId,
         side,
         price,

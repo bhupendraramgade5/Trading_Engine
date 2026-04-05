@@ -40,7 +40,7 @@ void PositionEngine::onFill(const Trade& trade)
         }
 
         pos.netQty = newQty;
-
+        pos.lastPrice = trade.price;
         // Update unrealized
         pos.unrealizedPnL =
             (pos.lastPrice - pos.avgPrice) * pos.netQty;
@@ -77,7 +77,7 @@ void PositionEngine::onFill(const Trade& trade)
         }
 
         pos.netQty = newQty;
-
+        pos.lastPrice = trade.price;
         pos.unrealizedPnL =
             (pos.lastPrice - pos.avgPrice) * pos.netQty;
     }

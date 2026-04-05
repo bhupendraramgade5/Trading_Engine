@@ -21,12 +21,14 @@ target_link_libraries(
 )
 
 
-# add_test(
-#     NAME MatchingTest
-#     COMMAND trading_engine < ${CMAKE_SOURCE_DIR}/tests/functional/input1.txt
-# )
+add_test(
+    NAME MatchingTest
+    COMMAND bash -c 
+    "cat ${CMAKE_SOURCE_DIR}/tests/functional/input1.txt | $<TARGET_FILE:trading_engine>"
+)
 
 include(GoogleTest)
 
 gtest_discover_tests(basic_tests)
 gtest_discover_tests(orderbook_tests)
+# gtest_discover_tests(MatchingTest)
